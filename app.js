@@ -7,6 +7,7 @@ function drawRect(x, y, width, height, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, width, height);
 }
+
 // circle
 function drawCirc(x, y, radius, color) {
     ctx.beginPath();
@@ -14,49 +15,55 @@ function drawCirc(x, y, radius, color) {
     ctx.fillStyle = color;
     ctx.fill();
 }
+
 // text
 function drawText(text, x, y, color) {
     ctx.font = "100px monospace";
     ctx.fillStyle = color;
     ctx.fillText(text, x, y);
 }
+
 // net
 function drawNet() {
     for (let i = 5; i <= screen.height; i += 30) {
         drawRect(screen.width / 2 - 2, i, 4, 20, 'white');
     }
 }
+
 // used to get offset for score display
 function getOffset(score) {
     return 28 * `${score}`.length;
 }
 
-// create the objects used in the game
+// objects used in the game
 // ball
 let ball = {
     x: screen.width / 2,
     y: screen.height / 2,
     radius: 15,
     color: 'white',
-    speed: 50,
+    speed: 5,
     xVel: 0,
     yVel: 0
 }
+
 // left paddle
 let left = {
     x: 0,
-    y: screen.height / 2 - 80,
+    y: screen.height / 2 - 70,
     width: 15,
-    height: 160,
+    height: 140,
     score: 0,
     color: 'white'
 }
+
+
 // right paddle
 let right = {
     x: screen.width - 15,
-    y: screen.height / 2 - 80,
+    y: screen.height / 2 - 70,
     width: 15,
-    height: 160,
+    height: 140,
     score: 0,
     color: 'white'
 }
@@ -72,6 +79,7 @@ function showScreen() {
     drawRect(right.x, right.y, right.width, right.height, right.color); // right paddle
     drawCirc(ball.x, ball.y, ball.radius, ball.color); // ball
 }
+
 // update game
 function updateGame() {
     // move ball
@@ -105,6 +113,7 @@ function updateGame() {
         spawnBall(false, server='right');
     }
 }
+
 // collsion detection
 function detectCollision(b, p) {
     // boundaries for ball
@@ -119,18 +128,19 @@ function detectCollision(b, p) {
     p.right = p.x + p.width;
     p.left = p.x;
 
-    return b.right > p.left && b.left < p.right && b.top < b.bottom && b.bottom > p.top;
+    return b.right > p.left && b.left < p.right && b.top < p.bottom && b.bottom > p.top;
 }
+
 // function to spawn new ball, both at start and when a score happens
 function spawnBall(newGame, server='') {
-    // set location to center
+    // set location to center, random height if not new game
     ball.x = screen.width / 2;
     ball.y = newGame ? screen.height / 2 : (Math.random() * (screen.height - 100)) + 50;
 
     // set random angle for serve (range is a 90deg cone pointing right or left depending on server)
     let randAngle = Math.random() * 0.5 * Math.PI - Math.PI / 4;
 
-    // chose server
+    // get server/random if new game
     if (!newGame) {
         if (server == 'right') {
             randAngle = randAngle + Math.PI;
@@ -143,6 +153,22 @@ function spawnBall(newGame, server='') {
     ball.xVel = ball.speed * Math.cos(randAngle);
     ball.yVel = ball.speed * Math.sin(randAngle);
 }
+
+// controls
+document.addEventListener('keypress', (e) => {
+    let code = e.key;
+    if (code == 'w' || code == 'W') {
+        left.y -= 5;
+    }
+    if (code == 's' || code == 'S') {
+        left.y += 5;
+    }
+    if (pvp) {
+        if (code == 'arrow up') {}
+    }
+    });
+
+// start game
 spawnBall(true)
 // main loop
 function game() {
