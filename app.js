@@ -1,3 +1,4 @@
+// get the screen canvas
 const screen = document.getElementById('screen');
 const ctx = screen.getContext('2d');
 
@@ -42,7 +43,7 @@ let ball = {
     y: screen.height / 2,
     radius: 15,
     color: 'white',
-    speed: 5,
+    speed: 15,
     xVel: 0,
     yVel: 0
 }
@@ -86,22 +87,29 @@ function updateGame() {
     ball.x += ball.xVel;
     ball.y += ball.yVel;
     // detect collision with top or bottom
-    if (ball.y <= ball.radius || ball.y >= screen.height - ball.radius) {
+    if (ball.y < ball.radius || ball.y > screen.height - ball.radius) {
         ball.yVel = -ball.yVel;
     }
     // detect collistion with paddle
+    // select paddle to detect collision with
     if (ball.x > screen.width / 2) {
         var paddle = right;
         var angleShift = Math.PI;
+        var angleFlip = -1;
     } else {
         var paddle = left;
         var angleShift = 0;
+        var angleFlip = 1;
     }
+    // detect collistion and make ball bounce
     if (detectCollision(ball, paddle)) {
-        let collisionPoint = (ball.y - paddle.height / 2) / paddle.height / 2;
-        let angle = collisionPoint * Math.PI / 4 + angleShift;
+        // angle of bounce depends on location of collision with paddle
+        // center = 0deg, edge = 45deg, linear relationship
+        let collisionPoint = (ball.y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
+        let angle = ((collisionPoint * Math.PI / 4) + angleShift) * angleFlip;
         ball.xVel = ball.speed * Math.cos(angle);
         ball.yVel = ball.speed * Math.sin(angle);
+        console.log(angle * 180 / Math.PI)
     }
     // detect score
     if (ball.x > screen.width) {
@@ -155,16 +163,21 @@ function spawnBall(newGame, server='') {
 }
 
 // controls
-document.addEventListener('keypress', (e) => {
-    let code = e.key;
-    if (code == 'w' || code == 'W') {
-        left.y -= 5;
+document.addEventListener('keydown', (e) => {
+    let code = e.code
+    if (code == 'KeyW' && left.y > 0) {
+        left.y -= 10;
     }
-    if (code == 's' || code == 'S') {
-        left.y += 5;
+    if (code == 'KeyS' && left.y < screen.height - left.height) {
+        left.y += 10;
     }
-    if (pvp) {
-        if (code == 'arrow up') {}
+    if (true) {
+        if (code == 'ArrowUp' && right.y > 0) {
+            right.y -= 10;
+        }
+        if (code == 'ArrowDown' && right.y < screen.height - right.height) {
+            right.y += 10;
+        }
     }
     });
 
