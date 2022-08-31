@@ -1,6 +1,7 @@
 // get the screen canvas
 const screen = document.getElementById('screen');
 const ctx = screen.getContext('2d');
+let volleyCtr = 0; // needs to be in global scope so it's not reset every frame
 
 // functions to draw things
 // rectangle
@@ -55,7 +56,8 @@ let left = {
     width: 15,
     height: 140,
     score: 0,
-    color: 'white'
+    color: 'white',
+    speed: 10
 }
 
 
@@ -66,7 +68,8 @@ let right = {
     width: 15,
     height: 140,
     score: 0,
-    color: 'white'
+    color: 'white',
+    speed: 10
 }
 
 // gameplay functions
@@ -86,10 +89,19 @@ function updateGame() {
     // move ball
     ball.x += ball.xVel;
     ball.y += ball.yVel;
+
     // detect collision with top or bottom
     if (ball.y < ball.radius || ball.y > screen.height - ball.radius) {
         ball.yVel = -ball.yVel;
     }
+    // fix bug that makes ball stick to top or bottom
+    if (ball.y > 0 && ball.y < ball.radius) {
+        ball.y = ball.radius;
+    }
+    if (ball.y < screen.height && ball.y > screen.height - ball.radius) {
+        ball.y = screen.height - ball.radius;
+    }
+
     // detect collistion with paddle
     // select paddle to detect collision with
     if (ball.x > screen.width / 2) {
@@ -107,19 +119,41 @@ function updateGame() {
         // center = 0deg, edge = 45deg, linear relationship
         let collisionPoint = (ball.y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
         let angle = ((collisionPoint * Math.PI / 4) + angleShift) * angleFlip;
+        volleyCtr += 0.5;
+        console.log(volleyCtr)
+        // volley counter events
+        if (volleyCtr == 3) {
+            ball.speed += 10;
+        }
+        if (volleyCtr == 6) {
+            ball.speed += 5;
+            left.speed += 5;
+            right.speed += 5;
+        }
+        // set new speed after checking volley count
         ball.xVel = ball.speed * Math.cos(angle);
         ball.yVel = ball.speed * Math.sin(angle);
-        console.log(angle * 180 / Math.PI)
     }
+
     // detect score
     if (ball.x > screen.width) {
         left.score++;
+        resetVolley();
         spawnBall(false, server='left');
     }
     if (ball.x < 0) {
         right.score++;
+        resetVolley();
         spawnBall(false, server='right');
     }
+}
+
+// reset volley effects
+function resetVolley() {
+    volleyCtr = 0;
+    ball.speed = 15;
+    left.speed = 10;
+    right.speed = 10;
 }
 
 // collsion detection
@@ -164,20 +198,20 @@ function spawnBall(newGame, server='') {
 
 // controls
 document.addEventListener('keydown', (e) => {
+    // left
     let code = e.code
     if (code == 'KeyW' && left.y > 0) {
-        left.y -= 10;
+        left.y -= left.speed;
     }
     if (code == 'KeyS' && left.y < screen.height - left.height) {
-        left.y += 10;
+        left.y += left.speed;
     }
-    if (true) {
-        if (code == 'ArrowUp' && right.y > 0) {
-            right.y -= 10;
-        }
-        if (code == 'ArrowDown' && right.y < screen.height - right.height) {
-            right.y += 10;
-        }
+    // right 
+    if (code == 'ArrowUp' && right.y > 0) {
+        right.y -= right.speed;
+    }
+    if (code == 'ArrowDown' && right.y < screen.height - right.height) {
+        right.y += right.speed;
     }
     });
 
