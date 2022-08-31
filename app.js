@@ -215,11 +215,31 @@ document.addEventListener('keydown', (e) => {
     }
     });
 
-// start game
-spawnBall(true)
-// main loop
-function game() {
-    showScreen();
-    updateGame();
+// sleeper function
+function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    })
 }
-setInterval(game, 50);
+
+// show titel screen
+drawRect(0, 0, screen.width, screen.height, 'black')    
+    ctx.font = "200px monospace";
+    ctx.fillStyle = 'white';
+    ctx.fillText('PONG-ish', 60, 370);
+// start game
+let startButton = document.getElementById('start-button')
+startButton.addEventListener('click', async () => {
+    startButton.style.backgroundColor = 'gray';
+    await sleep(100);
+    startButton.style.backgroundColor = 'lightgray';
+
+
+    spawnBall(true)
+    // main loop
+    function game() {
+        showScreen();
+        updateGame();
+    }
+    setInterval(game, 50);
+});

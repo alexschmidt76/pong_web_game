@@ -3,3 +3,21 @@ body {
     text-align: center;
 }
 
+#menu div {
+    display: inline-block;
+}
+
+#start-button,
+#reset-button{
+    width: 200px;
+    height: 70px;
+    border: 4px solid black;
+    background-color: lightgray;
+}
+
+p {
+    font-family: monospace;
+    font-size: 60px;
+    margin: 0;
+}
+
