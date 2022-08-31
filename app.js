@@ -237,39 +237,45 @@ function showTitleScreen() {
 showTitleScreen();
 
 // start game
+let gameOcurring = false;
 let startButton = document.getElementById('start-button');
 startButton.addEventListener('click', startGame);
 
 async function startGame() {
-    // button color change
-    startButton.style.backgroundColor = 'gray';
-    await sleep(100);
-    startButton.style.backgroundColor = 'lightgray';
+    if (!gameOcurring) {
+        gameOcurring = true;
 
-    // reset values from previous game
-    resetVolley();
-    left.score = 0;
-    right.score = 0;
-    left.y = screen.height / 2 - 70;
-    right.y = screen.height / 2 - 70;
+        // button color change
+        startButton.style.backgroundColor = 'gray';
+        await sleep(100);
+        startButton.style.backgroundColor = 'lightgray';
 
-    spawnBall(true)
-    // main loop
-    function game() {
-        showScreen();
-        updateGame();
+        // reset values from previous game
+        resetVolley();
+        left.score = 0;
+        right.score = 0;
+        left.y = screen.height / 2 - 70;
+        right.y = screen.height / 2 - 70;
 
-        // add listener for reset button
-        let resetButton = document.getElementById('reset-button')
-        resetButton.addEventListener('click', async () => {
-            // button color change
-            resetButton.style.backgroundColor = 'gray';
-            await sleep(100);
-            resetButton.style.backgroundColor = 'lightgray';
-            // stop gameloop and show title screen again
-            clearInterval(gameInterval);
-            showTitleScreen();
-        })
+        spawnBall(true)
+        // main loop
+        function game() {
+            showScreen();
+            updateGame();
+
+            // add listener for reset button
+            let resetButton = document.getElementById('reset-button')
+            resetButton.addEventListener('click', async () => {
+                // button color change
+                resetButton.style.backgroundColor = 'gray';
+                await sleep(100);
+                resetButton.style.backgroundColor = 'lightgray';
+                // stop gameloop and show title screen again
+                clearInterval(gameInterval);
+                showTitleScreen();
+                gameOcurring = false;
+            })
+        }
+        gameInterval = setInterval(game, 50);
     }
-    gameInterval = setInterval(game, 50);
 }
