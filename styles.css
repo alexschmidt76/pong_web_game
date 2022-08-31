@@ -15,7 +15,8 @@ body {
     background-color: lightgray;
 }
 
-p {
+#start-button p,
+#reset-button p {
     font-family: monospace;
     font-size: 60px;
     margin: 0;
